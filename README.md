@@ -1,47 +1,17 @@
-# My Zong customization patches
+# MyZong
 
-Morphe patches and Android extension code for personal customization of My Zong **5.19.19.112** (`com.zong.customercare`). Current source version: **1.2.12**.
+Morphe patch bundle for My Zong **5.19.19.112** (`com.zong.customercare`).
 
-Includes optional Home and navigation cleanup, shortcut filtering, recharge-section controls, charcoal dark styling, dialog and loader styling, startup handling, and rounded bundle-resource tables with dark backgrounds enforced before drawing.
+Download `MyZong-1.2.13.mpp` from [v1.2.13](https://github.com/FarhanZafarr-9/my-zong-customization/releases/tag/v1.2.13). In Morphe Manager, import the bundle and select a stock 5.19.19.112 APK. The new daily reward option is off by default. It was validated on the stock APK and still needs a phone test.
 
-## Source layout
+The signed APK from the previous build is available in [v1.2.12](https://github.com/FarhanZafarr-9/my-zong-customization/releases/tag/v1.2.12).
 
-- `patches/patches/src/main/kotlin/app/zonghome/patches/`: patch definitions and compiled-resource transformations.
-- `patches/extensions/extension/src/main/java/app/zonghome/extension/`: injected Android helpers.
-- `scripts/`: local bundle build, APK packaging/signing, and resource checks.
-- `tests/`: JVM helper fixtures and compiled-resource checks.
+## Build the bundle
 
-## Build
-
-The existing scripts target Windows PowerShell, JDK 23, Android SDK/build-tools 36.0.0, and a locally installed GitHub CLI. Review the machine-specific paths in the scripts before running them. Morphe's Gradle plugin is 2.0.0; the Gradle wrapper is included.
-
-Configure `patches/local.properties` with your Android SDK path. GitHub Packages authentication uses `GITHUB_ACTOR` and `GITHUB_TOKEN` (or Gradle properties `gpr.user` and `gpr.key`); never commit credentials. `Build-Bundle.ps1` obtains temporary credentials from the existing `gh` login and builds offline, so dependencies must already be cached. For an initial dependency download, build from `patches/` with `gradlew.bat --no-daemon buildAndroid` and those environment variables configured.
+Use Windows PowerShell, JDK 23, Android SDK build-tools 36.0.0, and GitHub CLI. Set the SDK path in `patches/local.properties` and adjust the local paths in `scripts/Build-Bundle.ps1` as needed. The script uses your `gh` login for GitHub Packages and expects Gradle dependencies to be cached. For the initial dependency download, run the Gradle wrapper from `patches/` with `GITHUB_ACTOR` and `GITHUB_TOKEN` configured and omit the offline flag.
 
 ```powershell
-# From the project root, after dependencies and local paths are configured:
-New-Item -ItemType Directory -Force builds, work | Out-Null
 .\scripts\Build-Bundle.ps1
 ```
 
-The bundle is written to `patches/patches/build/libs/patches-1.2.12.mpp`.
-
-APK packaging additionally requires locally supplied files that are deliberately excluded from Git:
-
-- `inputs/MyZong-5.19.19.112-adpatched.apk`: the matching base used by this project. Do not patch an already customized output.
-- `tools/morphe-desktop-2.0.0-all.jar`: Morphe CLI.
-- `private/home-clean-signing.p12` and `private/home-clean-key-password.txt`: your local signing identity, alias `home-clean`. Preserve the same key for compatible future updates.
-
-```powershell
-.\scripts\Package-TestBuild.ps1 -Version 1.2.12
-.\scripts\Test-InitialVisibility.ps1 -Version 1.2.12
-```
-
-The signed APK and copied bundle appear under `builds/`. Generated APKs, bundles, logs, device captures, original app artifacts, signing material, and local analysis evidence are not uploaded.
-
-## Validation and installation
-
-The v1.2.12 release built successfully; APK signature/alignment verification and 404 binary-XML checks passed. The user reported the cleaned APK working. Builds produced by Morphe with a different signing key cannot update a copy signed by the local project key. Android also checks copies retained in other users/profiles.
-
-UI behavior should be checked on a device after each visual change. No network/service implementation or original APK is included in this repository.
-
-License and upstream attribution are retained in `patches/LICENSE` and `patches/NOTICE`.
+The bundle is written to `patches/patches/build/libs/patches-1.2.13.mpp`. Source lives under `patches/` and validation fixtures under `tests/`. License and upstream attribution are in `patches/LICENSE` and `patches/NOTICE`.

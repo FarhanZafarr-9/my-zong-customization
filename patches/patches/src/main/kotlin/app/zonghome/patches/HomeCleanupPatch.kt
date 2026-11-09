@@ -10,7 +10,7 @@ import app.morphe.patcher.patch.bytecodePatch
 private const val HOME = "Lcom/zong/customercare/view/ui/FragHome;"
 private const val EXTENSION = "Lapp/zonghome/extension/HomeCleanup;"
 
-private val compatibility = Compatibility(
+internal val myZongCompatibility = Compatibility(
     name = "My Zong",
     packageName = "com.zong.customercare",
     apkFileType = ApkFileType.APK,
@@ -27,7 +27,7 @@ private fun homePatch(name: String, description: String, hook: String) = bytecod
     description = description,
     default = true
 ) {
-    compatibleWith(compatibility)
+    compatibleWith(myZongCompatibility)
     dependsOn(sharedExtensionPatch,initialHomeVisibility(hook))
     execute {
         val method = Fingerprint(
