@@ -305,6 +305,10 @@ The script uses your `gh` login for GitHub Packages and cached Gradle dependenci
 
 Local `inputs/`, `private/`, `tools/`, `work/`, `builds/`, and `docs/` are ignored by Git. Signing keys and proprietary input APKs are excluded. Older local builds are preserved under `builds/archive/`.
 
+### Remote source metadata
+
+Morphe resolves the Add to Morphe link through the root "patches-bundle.json" on "main". This manifest points to the published MPP and records its version and UTC release time. Update it whenever a new release is published; uploading an MPP to GitHub Releases alone does not update the remote source.
+
 ### Validation
 
 v1.2.22 passed its MPP build and a stock `.112` run with all 51 selectable patches enabled. Checks covered 362 binary-XML assertions, 13 adapter entry hooks, startup/indicator hook placement, absence of automatic scrolling hooks, first-frame Home hiding, and remaining allowance-card widths. A user phone test also passed; this does not cover every server-delivered screen or every optional configuration.
