@@ -2,9 +2,9 @@
 
 Morphe patches for customizing My Zong **5.19.19.112** (`com.zong.customercare`). Choose which sections remain visible, simplify navigation, apply a charcoal theme, and restyle cards, buttons, icons, and bundle controls.
 
-**Current release:** [MyZong v1.2.22](https://github.com/FarhanZafarr-9/my-zong-customization/releases/tag/v1.2.22) · **Download:** `MyZong-1.2.22.mpp`
+**Current release:** [MyZong v1.2.22](https://github.com/FarhanZafarr-9/myzong-patches/releases/tag/v1.2.22) · **Download:** `MyZong-1.2.22.mpp`
 
-[**Add to Morphe**](https://morphe.software/add-source?github=FarhanZafarr-9%2Fmy-zong-customization)
+[**Add to Morphe**](https://morphe.software/add-source?github=FarhanZafarr-9%2Fmyzong-patches)
 
 Open this link on your Android phone to add the patch source directly. You can also import the MPP manually using the steps below.
 
