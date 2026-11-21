@@ -4,10 +4,10 @@ $project=Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $project
 $java='C:\Program Files\Java\jdk-23.0.1\bin\java.exe'
 $sdk='C:\Users\hp\AppData\Local\Android\Sdk'
-$bundle="builds\zong-home-cleanup-$Version.mpp"
+$bundle="builds\MyZong-$Version.mpp"
 $unsigned="work\v$Version-unsigned.apk"
 $aligned="work\v$Version-aligned.apk"
-$final="builds\MyZong-5.19.19.112-cleanup-v$Version.apk"
+$final="builds\MyZong-5.19.19.112-v$Version.apk"
 function CheckExit { if($LASTEXITCODE -ne 0){throw "Command failed: $LASTEXITCODE"} }
 Copy-Item "patches\patches\build\libs\patches-$Version.mpp" $bundle
 & $java -jar tools\morphe-desktop-2.0.0-all.jar patch -p $bundle --bytecode-mode FULL --unsigned --validate -o $unsigned -t "work\morphe-v$Version-run" inputs\MyZong-5.19.19.112-adpatched.apk

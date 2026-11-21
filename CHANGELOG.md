@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.23
+
+- Renamed the embedded bundle from Zong Home Cleanup to MyZong, matching the source link and repository branding.
+- Replaced template/local-workspace metadata with the project URL and author; standardized generated artifact names.
+- Updated the Gradle project name and release documentation. Patch behavior is unchanged from 1.2.22.
+
 ## 1.2.22
 
 - Added a persistent Bundles controls button beside Search. Removed automatic scroll/touch-driven collapsing.

@@ -2,7 +2,7 @@
 
 Morphe patches for customizing My Zong **5.19.19.112** (`com.zong.customercare`). Choose which sections remain visible, simplify navigation, apply a charcoal theme, and restyle cards, buttons, icons, and bundle controls.
 
-**Current release:** [MyZong v1.2.22](https://github.com/FarhanZafarr-9/myzong-patches/releases/tag/v1.2.22) · **Download:** `MyZong-1.2.22.mpp`
+**Current release:** [MyZong v1.2.23](https://github.com/FarhanZafarr-9/myzong-patches/releases/tag/v1.2.23) · **Download:** `MyZong-1.2.23.mpp`
 
 [**Add to Morphe**](https://morphe.software/add-source?github=FarhanZafarr-9%2Fmyzong-patches&name=MyZong)
 
@@ -24,7 +24,7 @@ Open this link on your Android phone to add the patch source directly. You can a
 
 ## Installation
 
-1. Download `MyZong-1.2.22.mpp` from the release above. `SHA256SUMS.txt` provides its SHA-256 checksum.
+1. Download `MyZong-1.2.23.mpp` from the release above. `SHA256SUMS.txt` provides its SHA-256 checksum.
 2. Import the MPP as a patch source in Morphe Manager.
 3. Choose a **stock My Zong 5.19.19.112 APK** as input.
 4. Review the selected patches. Open **Customize home shortcuts**, **Customize header**, and **Charcoal dark mode** to adjust their options.
@@ -262,7 +262,7 @@ These are combinations of existing options, not named presets in Manager.
 
 The target is **5.19.19.112**, not `.117`. Use a fresh stock APK when changing the selection. This is a patch source, not an XAPK installer or a standalone replacement for My Zong's service. Morphe manages shared internal patch dependencies automatically.
 
-v1.2.22 resolves mapped raw-resource filenames when another source triggers resource decoding, retains bulk extraction, and still fails if a required file is actually missing. All 51 selected patches applied locally to stock `.112`, and the user confirmed the build works on their phone. The exact combination with Morphe's **Disable Play Store** patch has not been independently reproduced locally.
+v1.2.23 resolves mapped raw-resource filenames when another source triggers resource decoding, retains bulk extraction, and still fails if a required file is actually missing. All 51 selected patches applied locally to stock `.112`, and the user confirmed v1.2.22 works on their phone. v1.2.23 changes bundle branding and metadata only. The exact combination with Morphe's **Disable Play Store** patch has not been independently reproduced locally.
 
 For combined-source failures, capture the failing patch, full exception, source versions, Manager/Patcher versions, and input version. Another source may require a separate fix.
 
@@ -288,7 +288,7 @@ Use Windows PowerShell, JDK 23, Android SDK build-tools 36.0.0, and GitHub CLI. 
 .\scripts\Build-Bundle.ps1
 ```
 
-Output: `patches/patches/build/libs/patches-1.2.22.mpp`.
+Output: `patches/patches/build/libs/patches-1.2.23.mpp`.
 
 The script uses your `gh` login for GitHub Packages and cached Gradle dependencies. For initial dependency downloads, configure `GITHUB_ACTOR` and `GITHUB_TOKEN` and run the Gradle wrapper without `--offline`.
 
@@ -310,6 +310,9 @@ Local `inputs/`, `private/`, `tools/`, `work/`, `builds/`, and `docs/` are ignor
 Morphe resolves the Add to Morphe link through the root "patches-bundle.json" on "main". This manifest points to the published MPP and records its version and UTC release time. Update it whenever a new release is published; uploading an MPP to GitHub Releases alone does not update the remote source.
 
 ### Validation
+
+v1.2.23 is a branding/metadata update. Its MPP built successfully, and every payload entry is byte-identical to v1.2.22; only the bundle manifest changed. Refresh the remote source in Morphe to receive the corrected MyZong identity.
+
 
 v1.2.22 passed its MPP build and a stock `.112` run with all 51 selectable patches enabled. Checks covered 362 binary-XML assertions, 13 adapter entry hooks, startup/indicator hook placement, absence of automatic scrolling hooks, first-frame Home hiding, and remaining allowance-card widths. A user phone test also passed; this does not cover every server-delivered screen or every optional configuration.
 

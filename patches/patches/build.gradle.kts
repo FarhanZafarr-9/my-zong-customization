@@ -1,14 +1,13 @@
 group = "app.zonghome"
 
 patches {
-    // TODO: Update this section with your project details.
     about {
-        name = "Zong Home Cleanup"
-        description = "Personal home-screen cleanup for My Zong 5.19.19.112"
-        source = "local workspace"
-        author = "Personal customization"
-        contact = "na"
-        website = "na"
+        name = "MyZong"
+        description = "Customization patches for My Zong 5.19.19.112"
+        source = "https://github.com/FarhanZafarr-9/myzong-patches"
+        author = "FarhanZafarr-9"
+        contact = "https://github.com/FarhanZafarr-9/myzong-patches/issues"
+        website = "https://github.com/FarhanZafarr-9/myzong-patches"
         license = "GPLv3"
     }
 }
