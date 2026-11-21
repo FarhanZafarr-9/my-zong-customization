@@ -17,6 +17,10 @@ public class View {
     private ViewGroup.LayoutParams params;
     private android.graphics.drawable.Drawable background;
     private int left,top,right,bottom,minimumHeight;
+    private int paddingTop,paddingBottom;
+    public int getPaddingTop() { return paddingTop; }
+    public int getPaddingBottom() { return paddingBottom; }
+    public void setPadding(int left,int top,int right,int bottom) { paddingTop=top; paddingBottom=bottom; }
     public int getMinimumHeight() { return minimumHeight; }
     public void setMinimumHeight(int value) { minimumHeight=value; }
     public View add(String name,int id) { View v=new View(); resources.register(name,id); children.put(id,v); return v; }

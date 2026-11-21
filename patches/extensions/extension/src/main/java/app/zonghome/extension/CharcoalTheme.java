@@ -55,7 +55,11 @@ public final class CharcoalTheme {
 
     public static void onDialogShown(Object candidate) {
         if(!(candidate instanceof Dialog))return;
-        Dialog dialog=(Dialog)candidate;Window window=dialog.getWindow();
+        Dialog dialog=(Dialog)candidate;
+        PromotionControls.onDialogShown(dialog);
+        if(NavigationStyle.shapes() && dialog.getWindow()!=null) MaterialShapes.dialog(dialog.getWindow().getDecorView());
+        if(!installed)return;
+        Window window=dialog.getWindow();
         if(window==null || !dialog.isShowing())return;
         View root=window.getDecorView();
         State state=ROOTS.get(root);
@@ -64,6 +68,41 @@ public final class CharcoalTheme {
             if(root.isAttachedToWindow())state.onViewAttachedToWindow(root);
         }
         state.refreshAccent(root);state.onPreDraw();
+    }
+    public static int tabIndicatorColor(View view, int original) {
+        if(!installed)return original;
+        if(useSystemAccent() && Build.VERSION.SDK_INT>=31) {
+            int id=view.getResources().getIdentifier("system_accent1_200","color","android");
+            if(id!=0)return view.getResources().getColor(id,view.getContext().getTheme());
+        }
+        return ACCENT;
+    }
+    public static void refreshValidityControls() {
+        if(!installed)return;
+        ChipStyling.refreshVisiblePages();
+        for(State state:ROOTS.values()) {
+            View root=state.root.get();
+            if(root==null)continue;
+            for(String name:new String[]{"view_validity","btn_monthly","btn_weekly","btn_daily","tabsBundleMain"}) {
+                View view=ViewNames.find(root,name);
+                if(view!=null && view.getVisibility()==View.VISIBLE) {
+                    state.polishComponents(view);
+                    if(NavigationStyle.shapes())MaterialShapes.apply(view);
+                }
+            }
+        }
+    }
+    public static void onBoundView(View view) {
+        if (!installed) return;
+        android.content.Context context = view.getContext();
+        while (context instanceof android.content.ContextWrapper && !(context instanceof Activity)) {
+            android.content.Context next = ((android.content.ContextWrapper)context).getBaseContext();
+            if (next == context) break;
+            context = next;
+        }
+        State state = context instanceof Activity ? ROOTS.get(((Activity)context).getWindow().getDecorView()) : null;
+        if (state == null) { state = new State(view); state.refreshAccent(view); }
+        state.walk(view, false);
     }
     private static void attach(Activity a) {
         if(!a.getClass().getName().startsWith("com.zong.customercare."))return;
@@ -92,6 +131,8 @@ public final class CharcoalTheme {
         final java.util.HashMap<Class<?>,java.lang.reflect.Method[]> shapeAccessors=new java.util.HashMap<>();
         ViewTreeObserver observer;
         int accent=ACCENT,previousAccent=ACCENT;
+        long lastBundlePass;
+        final java.util.WeakHashMap<View,Integer> tabIndicators=new java.util.WeakHashMap<>();
         ColorStateList accentTint=ColorStateList.valueOf(ACCENT);
         ColorStateList actionTint=new ColorStateList(new int[][]{{-android.R.attr.state_enabled},{}},new int[]{RAISED,ACCENT});
         final ColorStateList filledText=new ColorStateList(new int[][]{{-android.R.attr.state_enabled},{}},new int[]{MUTED,ON_ACCENT});
@@ -124,13 +165,21 @@ public final class CharcoalTheme {
             navTint=new ColorStateList(new int[][]{{android.R.attr.state_checked},{}},new int[]{accent,MUTED});
         }
         @Override public boolean onPreDraw(){
-            View view=root.get();if(view!=null){walk(view,true);previousAccent=accent;}return true;
+            View view=root.get();
+            if(view!=null){
+                View bundles=ViewNames.find(view,"cardViewBundleMain")==null?null:ViewNames.find(view,"viewPager2");
+                long now=android.os.SystemClock.uptimeMillis();
+                if(bundles!=null && bundles.isShown() && lastBundlePass!=0 && now-lastBundlePass<200)return true;
+                walk(view,true);previousAccent=accent;lastBundlePass=now;
+            }
+            return true;
         }
         private void walk(View v,boolean decor){
+            if(v.getVisibility()!=View.VISIBLE)return;
             Drawable background=v.getBackground();
             if(background instanceof ColorDrawable && light(((ColorDrawable)background).getColor()))
                 v.setBackgroundColor(decor?BG:SURFACE);
-            if(Build.VERSION.SDK_INT>=24 && background instanceof GradientDrawable){
+            if(Build.VERSION.SDK_INT>=24 && background instanceof GradientDrawable && !entryName(v).equals("btnFavourite") && !ChipStyling.ownsBackground(background)){
                 ColorStateList color=((GradientDrawable)background).getColor();
                 if(color!=null && light(color.getDefaultColor()))((GradientDrawable)background).setColor(SURFACE);
             }
@@ -159,8 +208,7 @@ public final class CharcoalTheme {
                 }
             }
             if(v.getId()!=View.NO_ID){
-                String name="";
-                try{name=v.getResources().getResourceEntryName(v.getId());}catch(android.content.res.Resources.NotFoundException ignored){}
+                String name=entryName(v);
                 if("bottomNav".equals(name)){
                     setTint(v,"setItemTextColor",navTint);setTint(v,"setItemIconTintList",navTint);
                 }
@@ -214,11 +262,7 @@ public final class CharcoalTheme {
             }
             return false;
         }
-        private String entryName(View view) {
-            if(view.getId()==View.NO_ID)return "";
-            try{return view.getResources().getResourceEntryName(view.getId());}
-            catch(android.content.res.Resources.NotFoundException ignored){return "";}
-        }
+        private String entryName(View view) { return ViewNames.name(view); }
         private static int dp(View view,float value) {
             return Math.round(value*view.getResources().getDisplayMetrics().density);
         }
@@ -288,27 +332,7 @@ public final class CharcoalTheme {
                 }
             }
         }
-        private void chip(TextView view) {
-            ColorStateList incoming=view.getBackgroundTintList();
-            if(incoming!=neutralChipTint) {
-                if(incoming!=null) {
-                    int color=incoming.getDefaultColor();
-                    boolean active=color==ACCENT || color==accent || color==0xffe40077 || color==0xffed0181;
-                    view.setSelected(active);
-                }
-                view.setBackgroundTintList(neutralChipTint);
-            }
-            readableText(view,view.isSelected()?accent:TEXT);
-            int gap=dp(view,4);
-            ViewGroup.LayoutParams lp=view.getLayoutParams();
-            if(lp instanceof ViewGroup.MarginLayoutParams) {
-                ViewGroup.MarginLayoutParams m=(ViewGroup.MarginLayoutParams)lp;
-                if(m.getMarginStart()<gap || m.getMarginEnd()<gap) {
-                    m.setMarginStart(Math.max(gap,m.getMarginStart()));m.setMarginEnd(Math.max(gap,m.getMarginEnd()));
-                    view.setLayoutParams(m);
-                }
-            }
-        }
+        private void chip(TextView view) { ChipStyling.style(view); }
         private void tintCard(View view,int color) {
             try {
                 Object current=view.getClass().getMethod("getCardBackgroundColor").invoke(view);
@@ -346,6 +370,15 @@ public final class CharcoalTheme {
                 view.setBackgroundTintList(filterChoiceTint);
             }
             if(view.getTextColors()!=filterChoiceText)view.setTextColor(filterChoiceText);
+            try {
+                ColorStateList stroke = new ColorStateList(
+                    new int[][]{{android.R.attr.state_checked},{android.R.attr.state_selected},{}},
+                    new int[]{accent,accent,TRACK});
+                Object current = view.getClass().getMethod("getStrokeColor").invoke(view);
+                if (!(current instanceof ColorStateList) || ((ColorStateList)current).getDefaultColor()!=TRACK ||
+                        ((ColorStateList)current).getColorForState(new int[]{android.R.attr.state_selected},TRACK)!=accent)
+                    view.getClass().getMethod("setStrokeColor",ColorStateList.class).invoke(view,stroke);
+            } catch (ReflectiveOperationException ignored) { }
         }        private static final class BundleSurface extends GradientDrawable {
             BundleSurface(View view, boolean rounded) {
                 setColor(SURFACE);
@@ -362,12 +395,27 @@ public final class CharcoalTheme {
         }
         private void polishComponents(View view) {
             String name=entryName(view);
-            if(name.equals("llResources") || name.equals("ll_resources") || name.equals("rootBundleInfoItem"))
-                bundleSurface(view,true);
-            if(name.matches("info[1-8]") && view.getParent() instanceof View &&
+            if(name.equals("llResources") || name.equals("ll_resources") || name.equals("rootBundleInfoItem")) {
+                if(NavigationStyle.shapes()) {
+                    if(name.equals("llResources")) MaterialShapes.styleResourceGrid(view);
+                    else MaterialShapes.styleStandaloneCell(view);
+                } else bundleSurface(view,true);
+            }
+            if(!NavigationStyle.shapes() && (name.length()==5 && name.startsWith("info") && name.charAt(4)>='1' && name.charAt(4)<='8') && view.getParent() instanceof View &&
                     ((View)view.getParent()).getParent() instanceof View &&
                     entryName((View)((View)view.getParent()).getParent()).equals("llResources"))
                 bundleSurface(view,false);
+            if(name.equals("cvSearch"))tintCard(view,SURFACE);
+            if(name.equals("tvFlagName") && view instanceof TextView)readableText((TextView)view,TEXT);
+            if(name.equals("ivImage") && view instanceof ImageView) {
+                View parent=view;
+                while(parent!=null && !entryName(parent).equals("rvDynamicSearch"))
+                    parent=parent.getParent() instanceof View?(View)parent.getParent():null;
+                if(parent!=null) {
+                    ImageView icon=(ImageView)view;
+                    if(icon.getImageTintList()!=accentTint)icon.setImageTintList(accentTint);
+                }
+            }
             if(view instanceof TextView) {
                 TextView text=(TextView)view;
                 if(name.equals("tvMobileNumber") || name.equals("rechargeBundle") ||
@@ -384,7 +432,7 @@ public final class CharcoalTheme {
                 if(name.equals("tvBalance"))readableText(text,accent);
                 if(name.equals("btnLoan") || name.equals("btnPayLoan"))actionButton(view);
                 if(name.equals("btn_monthly") || name.equals("btn_weekly") || name.equals("btn_daily"))chip(text);
-                if(name.matches("(btn|iv)_item_[1-8]")) {
+                if(((name.startsWith("btn_item_") && name.length()==10 || name.startsWith("iv_item_") && name.length()==9) && name.charAt(name.length()-1)>='1' && name.charAt(name.length()-1)<='8')) {
                     backgroundTint(view,ColorStateList.valueOf(RAISED));readableText(text,view.isEnabled()?TEXT:MUTED);
                     // Keep existing state, shape, animation, dimensions and click handling.
                 }
@@ -485,7 +533,14 @@ public final class CharcoalTheme {
                name.equals("tvGetFree") || name.equals("tv200Mb") || name.equals("tvDescription")) {
                 if(view instanceof TextView)readableText((TextView)view,TEXT);
             }
-            if(name.equals("tabs")) {
+            if(name.equals("tabs") || name.equals("tabsBundleMain")) {
+                Integer applied=tabIndicators.get(view);
+                if(applied==null || applied!=accent) {
+                    try {
+                        view.getClass().getMethod("setSelectedTabIndicatorColor",int.class).invoke(view,accent);
+                        tabIndicators.put(view,accent);
+                    } catch(ReflectiveOperationException ignored) { }
+                }
                 try {
                     Object old=view.getClass().getMethod("getTabTextColors").invoke(view);
                     if(!(old instanceof ColorStateList) || ((ColorStateList)old).getDefaultColor()!=MUTED ||

@@ -308,6 +308,7 @@ internal class CharcoalResources {
                     val p = first + i * stride; val nameIndex = i32(input, p + 4)
                     require(nameIndex in names.indices)
                     val name = when(attributeIds.getOrNull(nameIndex)) {
+                        0x7f0400af -> "cardBackgroundColor"
                         0x010100d4 -> "background"
                         0x010100f4 -> "layout_width"
                         0x010100f5 -> "layout_height"
@@ -341,6 +342,8 @@ internal class CharcoalResources {
                     }
                     if ((dialogLayout || dialogShape) && background && ((type == 1 && data in whites) || (type in 28..31 && data ushr 24 != 0)))
                         replacement = CharcoalPalette.surface
+                    if(path.substringAfterLast("/")=="frag_searchview.xml" && name=="cardBackgroundColor")
+                        replacement=CharcoalPalette.surface
                     // Resource-grid cells share this drawable. Start dark at inflation as well
                     // as enforcing the rounded table surface before adapter-bound frames draw.
                     if(path.substringAfterLast("/")=="edit_text_history.xml" && name=="color")

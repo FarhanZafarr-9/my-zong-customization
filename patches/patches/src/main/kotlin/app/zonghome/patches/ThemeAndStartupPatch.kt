@@ -22,19 +22,30 @@ private val themeTarget=Compatibility(
     appIconColor=0x80c342,targets=listOf(AppTarget(version="5.19.19.112"))
 )
 
-// Morphe 2.1 routes res/* through decoded package directories even in RAW mode.
-// Extract through its existing raw-entry path and retain its change tracking.
+// Public get(res/*) resolves decoded XML; raw entries use Morphe's path-map aliases.
 internal fun ResourcePatchContext.compiledFile(path: String): java.io.File {
     if (!path.startsWith("res/")) return get(path)
-    val target=java.io.File(get("resources.arsc").parentFile,path)
-    if(target.isFile)return target
+    require(path.split('/').none { it == ".." }) { "Invalid resource path: $path" }
     val field=javaClass.getDeclaredField("resourceCoder").apply { isAccessible=true }
     val coder=field.get(this)
-    val extract=coder.javaClass.getDeclaredMethod("extractRootEntries",String::class.java).apply { isAccessible=true }
-    extract.invoke(coder,"res")
-    return java.io.File(get("resources.arsc").parentFile,path).also { check(it.isFile) { "Missing raw entry: $path" } }
+    val mapField=coder.javaClass.getDeclaredField("pathMap").apply { isAccessible=true }
+    val pathMap=mapField.get(coder)
+    val alias=(pathMap.javaClass.getMethod("getAlias",String::class.java)
+        .invoke(pathMap,path) as? String) ?: path
+    require(alias.startsWith("res/") && alias.split('/').none { it == ".." }) {
+        "Unexpected resource alias: $path -> $alias"
+    }
+    val target=java.io.File(get("resources.arsc").parentFile,alias)
+    if(!target.isFile) {
+        val extract=coder.javaClass.getDeclaredMethod("extractRootEntries",String::class.java)
+            .apply { isAccessible=true }
+        // Keep the coder's original-entry tracking; never replace decoded XML with binary.
+        extract.invoke(coder,"res")
+    }
+    check(target.isFile) { "Missing raw entry: $path (mapped to $alias)" }
+    return target
 }
-private val dialogWindowThemePatch=bytecodePatch {
+internal val dialogWindowThemePatch=bytecodePatch {
     dependsOn(sharedExtensionPatch)
     execute {
         val dialogTypes=mutableMapOf<String,Boolean>()
@@ -99,7 +110,7 @@ val charcoalDarkModePatch=bytecodePatch(
     default=true
 ) {
     compatibleWith(themeTarget)
-    dependsOn(sharedExtensionPatch,charcoalResourcesPatch,dialogWindowThemePatch)
+    dependsOn(sharedExtensionPatch,charcoalResourcesPatch,dialogWindowThemePatch,rowStylingPatch,bundleUiThemePatch)
     val materialAccent by booleanOption(
         key="systemMaterialAccent",title="Use system Material accent",
         description="Use Android 12+ wallpaper accent for highlighted values and navigation; use muted green on older Android.",

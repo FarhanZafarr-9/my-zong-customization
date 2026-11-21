@@ -14,6 +14,10 @@ internal fun initialHomeVisibility(hook:String)=rawResourcePatch {
                 "layoutAdaptiveParentAd","tvBanner","cardViewFlashSale","ribbon","tvFlashSale","timeRemaining",
                 "tvTime","tvRemaining","fragmentHotOffers")
             "hide5g" -> setOf("layout5g")
+            "hideSmsCard" -> setOf("cardSms")
+            "hideTariff" -> setOf("tvTariff")
+            "hideLoanButton" -> setOf("btnLoan")
+            "hideShortcutCard" -> setOf("cardTray")
             "hideWallet" -> setOf("z_wallet_view")
             "hideSteps" -> setOf("clStepCount","fragment_step_counter")
             "hideWeather" -> setOf("layoutWeatherWaly","imgWeatherExpend")

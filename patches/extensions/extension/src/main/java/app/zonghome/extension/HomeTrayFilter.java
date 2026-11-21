@@ -29,7 +29,9 @@ public final class HomeTrayFilter {
             char c = lower.charAt(i);
             if (Character.isLetterOrDigit(c)) result.append(c);
         }
-        return result.toString();
+        String key = result.toString();
+        if (key.equals("freembs") || key.equals("freemb") || key.equals("freemegabytes")) return "rewards";
+        return key;
     }
 
     public static List<?> filter(List<?> input) { return filterWithKeys(input, selectedKeys()); }
@@ -113,6 +115,7 @@ public final class HomeTrayFilter {
                 ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams) grid.getLayoutParams();
                 height += margins.topMargin + margins.bottomMargin;
             }
+            if (height > 0) height += card.getPaddingTop() + card.getPaddingBottom();
             boolean changed = false;
             if (card.getMinimumHeight() != 0) { card.setMinimumHeight(0); changed = true; }
             if (params.height != height) { params.height = height; card.setLayoutParams(params); changed = true; }

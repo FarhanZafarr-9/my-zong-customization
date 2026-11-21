@@ -11,11 +11,14 @@ import app.morphe.patcher.patch.stringsOption
 
 private const val FILTER = "Lapp/zonghome/extension/HomeTrayFilter;"
 private val choices = listOf(
-    "Rewards", "Daraz Hot Deals", "Brief History", "Rs 100 Shop", "20% Off", "IR",
+    "Rewards", "Free MBs", "Daraz Hot Deals", "Brief History", "Rs 100 Shop", "20% Off", "IR",
     "Tax Certificate", "Balance Save", "Yaari Load", "Call Blocks", "Book Your Number",
     "Value Added Services", "Business Sales Leads"
 )
-private fun key(label: String) = label.lowercase(java.util.Locale.ROOT).filter { it.isLetterOrDigit() }
+private fun shortcutKey(label: String): String {
+    val normalized = label.lowercase(java.util.Locale.ROOT).filter { it.isLetterOrDigit() }
+    return if (normalized in setOf("freembs", "freemb", "freemegabytes")) "rewards" else normalized
+}
 
 @Suppress("unused")
 val customizeHomeShortcutsPatch = bytecodePatch(
@@ -35,13 +38,13 @@ val customizeHomeShortcutsPatch = bytecodePatch(
         title = "Home shortcuts to keep",
         default = listOf("Rewards", "Rs 100 Shop"),
         description = "Choose multiple names in this list. Unlisted or future shortcuts stay hidden. " +
-            "Available: " + choices.joinToString(", ") + ". An empty list hides all shortcuts.",
+            "Use the displayed shortcut names, including any names added by the server. Examples: " + choices.joinToString(", ") + ". An empty list hides all shortcuts.",
         required = true,
-        validator = { selected -> selected != null && selected.all { item -> choices.any { key(it) == key(item) } } }
+        validator = { selected -> selected != null && selected.all { item -> shortcutKey(item).isNotEmpty() } }
     )
 
     execute {
-        val encoded = requireNotNull(kept).map(::key).distinct().joinToString("|")
+        val encoded = requireNotNull(kept).map(::shortcutKey).distinct().joinToString("|")
         check(encoded.all { it.isLetterOrDigit() || it == '|' }) { "Invalid shortcut encoding" }
         val config = Fingerprint(
             definingClass = FILTER, name = "selectedKeys", returnType = "Ljava/lang/String;", parameters = emptyList()

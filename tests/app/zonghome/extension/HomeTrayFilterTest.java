@@ -24,15 +24,20 @@ public class HomeTrayFilterTest {
         if (!HomeTrayFilter.filterWithKeys(input, " REWARDS |RS100SHOP|rewards").equals(selected))
             throw new AssertionError("Case, punctuation, spacing or repeated selections");
         if (HomeTrayFilter.filter(null) != null) throw new AssertionError("Changed original null handling");
+        Item freeMbs = new Item("Free MBs");
+        if (!HomeTrayFilter.filterWithKeys(Arrays.asList(freeMbs, shop), "Rewards|Rs 100 Shop").equals(Arrays.asList(freeMbs, shop)))
+            throw new AssertionError("Server Free MBs alias was hidden");
+        if (!HomeTrayFilter.filterWithKeys(input, "Free MBs").equals(Arrays.asList(rewards)))
+            throw new AssertionError("Free MBs selection did not preserve Rewards");
         HomeTrayFilter.filterWithKeys(input,"rewards|rs100shop");
         View root=new View(),card=root.add("cardTray",1),grid=root.add("rvHomeTray",2),more=root.add("viewMoreBtn",3);
         ViewGroup.LayoutParams cardParams=new ViewGroup.LayoutParams(300,190);
-        card.setLayoutParams(cardParams);card.setMinimumHeight(90);
+        card.setLayoutParams(cardParams);card.setMinimumHeight(90);card.setPadding(16,16,16,16);
         ViewGroup.MarginLayoutParams gridParams=new ViewGroup.MarginLayoutParams(300,48);
         gridParams.topMargin=10;gridParams.bottomMargin=20;
         grid.setLayoutParams(gridParams);grid.layout(0,0,300,48);
         HomeTrayFilter.attach(root);root.attach();
-        if(root.getViewTreeObserver().draw() || cardParams.height!=78 || card.getMinimumHeight()!=0 || more.getVisibility()!=View.GONE)
+        if(root.getViewTreeObserver().draw() || cardParams.height!=110 || card.getMinimumHeight()!=0 || more.getVisibility()!=View.GONE)
             throw new AssertionError("Compact small grid and remove redundant View More");
         if(!root.getViewTreeObserver().draw())throw new AssertionError("Sizing did not settle");
         HomeTrayFilter.filterWithKeys(Arrays.asList(rewards,rewards,rewards,rewards,rewards,rewards,rewards,rewards,rewards),"rewards");
