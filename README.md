@@ -4,7 +4,7 @@ Morphe patches for customizing My Zong **5.19.19.112** (`com.zong.customercare`)
 
 **Current release:** [MyZong v1.2.22](https://github.com/FarhanZafarr-9/myzong-patches/releases/tag/v1.2.22) · **Download:** `MyZong-1.2.22.mpp`
 
-[**Add to Morphe**](https://morphe.software/add-source?github=FarhanZafarr-9%2Fmyzong-patches)
+[**Add to Morphe**](https://morphe.software/add-source?github=FarhanZafarr-9%2Fmyzong-patches&name=MyZong)
 
 Open this link on your Android phone to add the patch source directly. You can also import the MPP manually using the steps below.
 
