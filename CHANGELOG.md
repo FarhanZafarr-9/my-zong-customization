@@ -1,5 +1,45 @@
 # Changelog
 
+## 1.3.3
+
+- Organized settings into 15 patches and six categories.
+- Added Material You colors with charcoal fallback.
+- Added rounded Light/Dark icons and matching static splash.
+- Refined onboarding and Rewards styling.
+- Fixed OTP paste across digit boxes.
+- Added optional personal-details skip after OTP.
+- Fixed neutral Usage values and navigation feedback.
+- Reduced bundle blinking and Home button flashes.
+- Made the loading rings loop smoothly.
+
+## 1.3.2 (local test build)
+
+- Style onboarding, registration, language and wallet PIN/OTP form controls, including focus, disabled and error states.
+- Add independent Startup option for PIN/OTP paste distribution, row isolation, partial replacement and overflow rejection.
+- Preserve native validation callbacks and normal single-digit typing.
+
+# Changelog
+
+## 1.3.1 (local test build)
+
+- Replaced generic option descriptions with precise screen-specific titles, effects and dependencies.
+- Fixed Light/Dark launcher icons: disable AAPT resource auto-version stripping and validate vector dimensions, path data and colors before packaging.
+- Added low-opacity Material bottom-navigation ripple/indicator colors.
+- Made adapter rows the sole styling owner for offer lists and disabled their item-change crossfades while preserving movement animations.
+- Refined reward intro/results/rules/history typography, stateful game tiles and primary actions; preserved game geometry and handlers. Onboarding art uses fit-center against the dark surface.
+
+Release remains deferred for phone testing.
+
+## 1.3.0
+
+- Organized 15 public patches into Appearance, Home, Header & navigation, Bundles & Usage, Recharge & dialogs, and Startup & rewards.
+- Consolidated the former 51-patch list into grouped option screens, retaining 49 individually reversible switches and the existing effective defaults. Visibility options use positive Show labels.
+- Replaced Charcoal dark mode with Material You theme: dark system palette roles on Android 12+, automatic whole-palette charcoal fallback on older/unsupported devices, and an option to force charcoal.
+- Added optional Light/Dark vector launcher icons, updating regular and round references without changing notification icons or the startup cover.
+- Added catalog, grouped-APK visibility, icon/manifest isolation, dynamic-palette and fallback regressions. Icon assets are reproducibly compiled from readable vector sources.
+
+Migration: review your selections once. Old individual patch selections cannot automatically migrate into the new group options. Launcher icon and Skip daily reward ad remain unselected by default.
+
 ## 1.2.23
 
 - Renamed the embedded bundle from Zong Home Cleanup to MyZong, matching the source link and repository branding.
